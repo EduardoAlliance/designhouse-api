@@ -2,6 +2,8 @@
 
 namespace App\Exceptions;
 
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Throwable;
 
@@ -50,6 +52,26 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Throwable $exception)
     {
+
+        if($request->expectsJson()) {
+
+            //$message = $exception->getMessage();
+            if ($exception instanceof AuthorizationException) {
+                $message= $exception->getMessage();
+                return response()->json(["errors" => [
+                    "message" => $message
+                ]], 403);
+            }
+
+            if ($exception instanceof ModelNotFoundException) {
+                $message= "The resource was not found";
+                return response()->json(["errors" => [
+                    "message" => $message
+                ]], 403);
+            }
+
+        }
+
         return parent::render($request, $exception);
     }
 }

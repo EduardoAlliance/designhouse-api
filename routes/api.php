@@ -24,4 +24,8 @@ Route::group(['middleware'=> ['auth:api']],function (){
     Route::put('settings/profile','User\SettingsController@updateProfile');
     Route::put('settings/password','User\SettingsController@updatePassword');
 
+    //Designs
+    Route::post('designs/upload','Designs\UploadController@upload');
+    Route::resource('designs','Designs\DesignsController',['only'=>['update','show','destroy']]);
+
 });

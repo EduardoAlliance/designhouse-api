@@ -13,10 +13,12 @@
         "fruitcake/laravel-cors": "^2.0",
         "grimzy/laravel-mysql-spatial": "^2.0",
         "guzzlehttp/guzzle": "^6.3.1|^7.0.1",
+        "intervention/image": "^2.5",
         "laravel/framework": "^7.29",
         "laravel/tinker": "^2.5",
         "laravel/ui": "^2.0",
-        "tymon/jwt-auth": "^1.0.0-rc.5"
+        "tymon/jwt-auth": "^1.0.0-rc.5",
+        "cviebrock/eloquent-taggable":"^7.0"
     },
     "require-dev": {
         "facade/ignition": "^2.0",
