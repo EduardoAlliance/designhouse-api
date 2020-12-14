@@ -55,7 +55,7 @@ class Handler extends ExceptionHandler
 
         if($request->expectsJson()) {
 
-            //$message = $exception->getMessage();
+
             if ($exception instanceof AuthorizationException) {
                 $message= $exception->getMessage();
                 return response()->json(["errors" => [

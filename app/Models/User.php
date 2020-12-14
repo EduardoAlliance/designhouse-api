@@ -14,50 +14,56 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
 {
     use Notifiable, SpatialTrait;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
-
     protected $fillable = [
         'name', 'email', 'password','tagline','about','location','available_to_hire','formatted_address',
     ];
     protected $spatialFields = [
         'location',
     ];
-    /**
-     * The attributes that should be hidden for arrays.
-     *
-     * @var array
-     */
+
     protected $hidden = [
         'password', 'remember_token',
     ];
 
-    /**
-     * The attributes that should be cast to native types.
-     *
-     * @var array
-     */
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
 
+    //relations
     public function designs(){
         return $this->hasMany(Design::class);
     }
 
-    public function sendEmailVerificationNotification()
-    {
+    public function comments(){
+        return $this->hasMany(Comment::class);
+    }
+
+    public function teams(){
+        return $this->belongsToMany(Team::class)->withTimestamps();
+    }
+
+    //invitations
+    public function invitations(){
+        return $this->hasMany(Invitation::class,'recipient_email','email');
+    }
+
+    // end relations
+
+    public function ownedTeams(){
+        return $this->teams()->when('owner_id',$this->id);
+    }
+
+    public function isOwnerOfTeam($team){
+        return (bool)$this->teams()->where('id',$team->id)->where('owner_id',$this->id)->count();
+    }
+
+    public function sendEmailVerificationNotification(){
         $this->notify(new VerifyEmail);
     }
 
     public function sendPasswordResetNotification($token){
         $this->notify(new ResetPassword($token));
     }
-
-
 
     /**
      * Get the identifier that will be stored in the subject claim of the JWT.

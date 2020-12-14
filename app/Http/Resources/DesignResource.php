@@ -15,18 +15,24 @@ class DesignResource extends JsonResource
     public function toArray($request)
     {
         return [
-            'id'=>$this->id,
-            'user'=> new UserResource($this->user),
+            'u_id'=>$this->u_id,
             'title'=>$this->title,
             'slug'=>$this->slug,
             'is_live'=>$this->publish,
             'images'=> $this->images,
             'description'=>$this->description,
+            'likes_count'=>$this->likes->count(),
             'created_at'=>$this->created_at->diffForHumans(),
             'tag_list'=>[
                 'normalized' => $this->tagArrayNormalized,
                 'tags' => $this->tagArray
-            ]
+            ],
+            'team'=> $this->team ? [
+                $this->team->name,
+                $this->team->slug
+            ] : null,
+            'comments'=> CommentResource::collection($this->whenLoaded('comments')),
+            'user'=> new UserResource($this->whenLoaded('user')),
         ];
     }
 }

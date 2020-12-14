@@ -2,16 +2,17 @@
 
 namespace App\Models;
 
+use App\Models\Traits\Likeable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 use Cviebrock\EloquentTaggable\Taggable;
 
 class Design extends Model
 {
-    use Taggable;
+    use Taggable, Likeable;
 
     protected $fillable = [
-      'user_id','u_id',
+      'user_id','u_id','team_id',
       'image','title','description','slug','can_comment','publish','upload_successful','disk'
     ];
 
@@ -19,10 +20,22 @@ class Design extends Model
         return 'u_id';
     }
 
+    //realtions
     public function user(){
         return $this->belongsTo(User::class);
     }
 
+    public function comments(){
+        return $this->morphMany(Comment::class,'commentable')->orderBy('created_at','asc');
+    }
+
+    public function team(){
+        return $this->belongsTo(Team::class);
+    }
+
+
+
+    //end relations
     public function getImagesAttribute(){
         return [
             'original'=>$this->getImagePath('original'),

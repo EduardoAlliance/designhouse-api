@@ -26,7 +26,11 @@ class UpdateDesign extends FormRequest
         return [
             'title'=>'required|unique:designs,title,'.$this->design->id,
             'description'=>'required|string|max:140|min:20',
-            'tags'=>'required'
+            'tags'=>'required',
+            'team'=> 'required_if:assign_to_team,true'
         ];
     }
+
+
+
 }

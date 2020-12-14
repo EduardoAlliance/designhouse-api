@@ -12,67 +12,18 @@ use Illuminate\Support\Str;
 
 class DesignsController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+
     public function index()
     {
-        //
+        $designs = Design::all();
+        return DesignResource::collection($designs->loadMissing('user','comments'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  Design $design
-     * @return DesignResource
-     */
     public function show(Design $design)
     {
-        return new DesignResource($design);
+        return new DesignResource($design->loadMissing('user','comments'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  UpdateDesign  $request
-     * @param  Design $design
-     * @throws
-     * @return DesignResource
-     */
     public function update(UpdateDesign $request,  Design $design)
     {
         $this->authorize('update',$design);
@@ -80,7 +31,8 @@ class DesignsController extends Controller
             'title'=>$request->title,
             'description'=>$request->description,
             'slug'=> Str::slug($request->title),
-            'publish'=> ! $design->upload_successful ? false : $request->is_live
+            'publish'=> ! $design->upload_successful ? false : $request->is_live,
+            'team_id'=>$request->team
         ]);
 
         $design->retag($request->tags);
@@ -88,7 +40,6 @@ class DesignsController extends Controller
         return new DesignResource($design);
 
     }
-
 
     public function destroy($id)
     {
@@ -104,4 +55,27 @@ class DesignsController extends Controller
         $design->delete();
         return response()->json(["message"=>"Design deleted"]);
     }
+
+    public function like($design_id){
+
+         $design = Design::where('u_id',$design_id)->firstOrFail();
+
+        if($design->isLikeByUser(auth()->id())){
+            $design->unlike();
+        }else{
+            $design->like();
+        }
+
+        return response()->json(['message'=>'success'],200);
+
+    }
+
+    public function likedByUser($design_id){
+        $design = Design::where('u_id',$design_id)->firstOrFail();
+        $liked = $design->isLikeByUser();
+
+        return response()->json(['liked'=>$liked]);
+
+    }
+
 }
