@@ -50,10 +50,19 @@ Route::group(['middleware'=> ['auth:api']],function (){
     Route::put('teams/{team}','Teams\TeamsController@update');
     Route::delete('teams/{team}','Teams\TeamsController@destroy');
     Route::get('users/teams','Teams\TeamsController@getUserTeams');
+    Route::delete('teams/{team}/users/{user}','Teams\TeamsController@removeFromTeam');
 
     //Invitations
     Route::post('invitations/{team}','Teams\InvitationsController@invite');
     Route::post('invitations/{invitation}/resend','Teams\InvitationsController@resend');
     Route::post('invitations/{invitation}/respond','Teams\InvitationsController@respond');
     Route::delete('invitations/{invitation}','Teams\InvitationsController@destroy');
+
+    //Chats
+    Route::post('chats','Chats\ChatController@sendMessage');
+    Route::get('chats','Chats\ChatController@getUsersChats');
+    Route::get('chats/{chat_id}/messages','Chats\ChatController@getChatMessages');
+    Route::put('chats/{chat_id}/markAsRead','Chats\ChatControler@markAsRead');
+    Route::delete('messages/{message_id}','Chats\ChatControler@destroyMessage');
+
 });
