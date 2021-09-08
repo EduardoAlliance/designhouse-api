@@ -41,6 +41,19 @@ class UploadImage implements ShouldQueue
 
         try{
 
+            if(!file_exists(storage_path('uploads/'))){
+                File::makeDirectory(storage_path('uploads/large'),755,true,true);
+            }
+
+            if(!file_exists(storage_path('uploads/large'))){
+                File::makeDirectory(storage_path('uploads/large'),755,true,true);
+            }
+
+            if(!file_exists(storage_path('uploads/thumbnail'))){
+                File::makeDirectory(storage_path('uploads/thumbnail'),755,true,true);
+            }
+
+
             //create large image and save to tmp
             Image::make($original_file)->fit(800,600,function ($constraint){
                 $constraint->aspectRatio();

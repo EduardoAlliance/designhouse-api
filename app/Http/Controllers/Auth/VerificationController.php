@@ -25,18 +25,18 @@ class VerificationController extends Controller
         if(!$user){
             return response()->json(['errors'=>[
                 'message'=>'Email does not exists'
-            ]]);
+            ]],404);
         }
 
         if(! URL::hasValidSignature($request)){
             return response()->json(['errors'=>[
                 'message'=>'Invalid verification link'
-            ]]);
+            ]],404);
         }
         if($user->hasVerifiedEmail()){
             return response()->json(['errors'=>[
                 'message'=>'Email address already verified'
-            ]]);
+            ]],404);
         }
 
         $user->markEmailAsVerified();
@@ -57,13 +57,13 @@ class VerificationController extends Controller
         if(!$user){
             return response()->json(['errors'=>[
                 'message'=>'Email does not exists'
-            ]]);
+            ]],404);
         }
 
         if($user->hasVerifiedEmail()){
             return response()->json(['errors'=>[
                 'message'=>'Email address already verified'
-            ]]);
+            ]],404);
         }
         $user->sendEmailVerificationNotification();
 

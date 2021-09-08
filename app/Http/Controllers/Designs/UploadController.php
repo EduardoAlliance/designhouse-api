@@ -31,5 +31,7 @@ class UploadController extends Controller
 
         //dispatch a job to handle image manipulation
         $this->dispatch(new UploadImage($design));
+
+        return response()->json($design, 200);
     }
 }

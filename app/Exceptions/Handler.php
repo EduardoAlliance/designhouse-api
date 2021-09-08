@@ -56,6 +56,7 @@ class Handler extends ExceptionHandler
         if($request->expectsJson()) {
 
 
+
             if ($exception instanceof AuthorizationException) {
                 $message= $exception->getMessage();
                 return response()->json(["errors" => [
@@ -69,6 +70,8 @@ class Handler extends ExceptionHandler
                     "message" => $message
                 ]], 403);
             }
+
+
 
         }
 

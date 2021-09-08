@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Teams;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\DesignResource;
 use App\Http\Resources\TeamResource;
 use App\Models\Team;
 use App\Models\User;
@@ -62,17 +63,13 @@ class TeamsController extends Controller
     }
 
     public function getUserTeams(){
-        $teams = auth()->user()->team();
+        $teams = auth()->user()->teams;
         return TeamResource::collection($teams);
     }
 
     public function findBySlug($slug){
-        $team = Team::where('slug',$slug)->first();
-        if($team){
-            return new TeamResource($team);
-        }else{
-           abort(404);
-        }
+        $team = Team::where('slug',$slug)->firstOrFail();
+        return new TeamResource($team);
     }
 
     public function removeFromTeam(Team $team,User $user){
@@ -82,7 +79,7 @@ class TeamsController extends Controller
         if($user->isOwnerOfTeam($team)){
             return response()->json(['message','You cannot do this']);
         }
-         
+
         //check the auth is not the owner and is the person whi want to leave the team
         // user authenticated can not remove other user
         if(!auth()->user()->isOwnerOfTeam($team) && auth()->id() !== $user->id){
@@ -91,6 +88,13 @@ class TeamsController extends Controller
 
         $team->removeUserFromTeam($user->id);
         return response()->json(['message'=>'Success']);
+    }
+
+    public function getDesigns(Team $team){
+
+        $designs = $team->designs()->isPublish()->get();
+        return DesignResource::collection($designs);
+
     }
 
 

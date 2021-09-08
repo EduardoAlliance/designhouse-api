@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Notifications\ResetPassword;
 use App\Notifications\VerifyEmail;
+use Grimzy\LaravelMysqlSpatial\Types\Point;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -29,6 +30,17 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
         'email_verified_at' => 'datetime',
     ];
 
+    protected $appends=[
+        'photo_url'
+    ];
+
+    public function getPhotoUrlAttribute(){
+
+        return 'https://www.gravatar.com/avatar/'.md5(strtolower($this->email)).'.jpg=?s=200&d=mm';
+
+    }
+
+
     //relations
     public function designs(){
         return $this->hasMany(Design::class);
@@ -39,7 +51,7 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
     }
 
     public function teams(){
-        return $this->belongsToMany(Team::class)->withTimestamps();
+        return $this->belongsToMany(Team::class);
     }
 
     //invitations
@@ -84,6 +96,44 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
     public function sendPasswordResetNotification($token){
         $this->notify(new ResetPassword($token));
     }
+
+    public function search($request){
+        $query = $this->newQuery();
+
+        if($request->has_designs){
+            $query->has('designs');
+        }
+
+        if($request->available_to_hire){
+            $query->where('available_to_hire',true);
+        }
+
+        //Geo search
+        $lat = $request->latitude;
+        $lng = $request->longitude;
+        $dist = $request->distance;
+        $unit = $request->unit;
+
+        if($lat && $lng){
+            $point = new Point($lat,$lng);
+            $unit = 'km' ? $dist *= 1000 : $dist *= 1609.34;
+            $query->distanceExcludingSelf('location',$point,$dist);
+        }
+
+
+        //order results
+        if($request->orderBy=='closest'){
+            $query->orderByDistance('location',$point,'asc');
+        }else if($request->orderBy == 'latest'){
+            $query->latest();
+        }else{
+            $query->oldest();
+        }
+
+        return $query->get();
+
+    }
+
 
     /**
      * Get the identifier that will be stored in the subject claim of the JWT.

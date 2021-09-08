@@ -43,7 +43,7 @@ class DesignsController extends Controller
 
     public function destroy($id)
     {
-        $design = Design::where('u_id',$id)->first();
+        $design = Design::where('u_id',$id)->firstOrFail();
 
         $this->authorize('delete',$design);
         //remove design images
@@ -75,7 +75,26 @@ class DesignsController extends Controller
         $liked = $design->isLikeByUser();
 
         return response()->json(['liked'=>$liked]);
+    }
 
+    public function searchDesigns(Request  $request){
+
+        $design = new Design();
+        $designs = $design->search($request);
+        return DesignResource::collection($designs);
+
+    }
+
+    public function findBySlug($slug){
+
+        $design = Design::where('slug',$slug)->firstOrFail();
+
+        return new DesignResource($design);
+    }
+
+    public function userOwnsDesign($uid){
+        $design = Design::where('u_id',$uid)->where('user_id',auth()->user()->id)->firstOrFail();
+        return new DesignResource($design);
     }
 
 }

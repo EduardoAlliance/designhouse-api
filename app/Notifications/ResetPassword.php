@@ -12,7 +12,7 @@ class ResetPassword extends Notification
 {
     public function toMail($notifiable)
     {
-        $url = url(config('app.client_url').'/password/reset/?token='.$this->token.'&email='.$notifiable->getEmailForPasswordReset());
+        $url = url(config('app.client_url').'/password/reset/'.$this->token.'?email='.$notifiable->getEmailForPasswordReset());
         return (new MailMessage)
             ->subject(Lang::get('Reset Password Notification'))
             ->line(Lang::get('You are receiving this email because we received a password reset request for your account.'))

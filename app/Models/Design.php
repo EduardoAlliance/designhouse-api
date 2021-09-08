@@ -48,4 +48,43 @@ class Design extends Model
         return Storage::disk($this->disk)->url('uploads/designs/'.$size.'/'.$this->image);
     }
 
+    public function search($request){
+
+
+        $query = $this->newQuery();
+        $query->where('publish',true);
+
+        //return designs with comments
+        if($request->has_comments){
+            $query->has('comments');
+        }
+
+        //return designs with team
+        if($request->has_team ){
+            $query->has('team');
+        }
+
+        //search title and description
+        if($request->q){
+            $query->where(function($q) use ($request){
+                $q->where('title','like','%'.$request->q.'%')
+                    ->orWhere('description','like','%'.$request->q.'%');
+            });
+        }
+
+        // order
+        if($request->orderBy == 'likes'){
+            $query->withCount('likes')
+                ->orderByDesc('likes_count');
+        }else{
+            $query->latest();
+        }
+
+        return $query->get();
+    }
+
+    public function scopeIsPublish($query){
+        return $query->where('publish',1) ;
+    }
+
 }

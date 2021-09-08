@@ -20,7 +20,7 @@ class ProfileJsonResponse
         $response =  $next($request);
 
         if(!env('APP_DEBUG') ){
-            return response;
+            return $response;
         }
 
         if($response instanceof JsonResponse ){

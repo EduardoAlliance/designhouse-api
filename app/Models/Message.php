@@ -14,6 +14,16 @@ class Message extends Model
         'user_id','chat_id','body','last_read'
     ];
 
+
+    public function getBodyAttribute($value){
+
+        if($this->trashed()){
+            return 'This message has been deleted';
+        }
+        return $value;
+
+    }
+
     public function user(){
         return $this->belongsTo(User::class);
     }

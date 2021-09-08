@@ -4,12 +4,31 @@
 Route::get('/',function(){
    return response()->json([ 'message' => "Hello worlds"]);
 });
+
+
 Route::get('me','User\MeController@getMe');
+
+//Designs
 Route::get('designs','Designs\DesignsController@index');
+Route::get('designs/name/{slug}','Designs\DesignsController@findBySlug');
+
+//Users
 Route::get('users','User\UsersController@index');
+Route::get('users/{user}/designs','User\UsersController@getDesignsForUser');
+
 
 //Teams
 Route::get('teams/name/{slug}','Teams\TeamsController@findBySlug');
+Route::get('teams/{team}/designs','Teams\TeamsController@getDesigns');
+
+
+//Search Designs
+Route::get('search/designs','Designs\DesignsController@searchDesigns');
+
+//Search Designers
+Route::get('search/designers','User\UsersController@searchDesigners');
+
+
 
 
 //Guest
@@ -32,7 +51,10 @@ Route::group(['middleware'=> ['auth:api']],function (){
 
     //Designs
     Route::post('designs/upload','Designs\UploadController@upload');
-    Route::resource('designs','Designs\DesignsController',['only'=>['update','show','destroy']]);
+    //Route::resource('designs','Designs\DesignsController',['only'=>['update','show']]);
+    Route::put('designs/{design}','Designs\DesignsController@update');
+    Route::delete('designs/{u_id}','Designs\DesignsController@destroy');
+    Route::get('designs/{id}','Designs\DesignsController@userOwnsDesign');
 
     //Like Unlike Comments
     Route::post('designs/{id}/like','Designs\DesignsController@like');
